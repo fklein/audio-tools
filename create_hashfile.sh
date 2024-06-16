@@ -16,7 +16,7 @@ album=$(get_album_title "${1}") || { echo "Error: failed to retrieve album title
 outfile="${artist} -00- ${album}.sha256"
 timestamp="$(date +'%A %Y-%m-%d %H:%M:%S')"
 
-[[ -f ${outfile} ]] && mv -f --backup=numbered "${outfile}" "${outfile}.bak"
+[[ -f ${outfile} ]] && mv -vf --backup=numbered "${outfile}" "${outfile}.bak"
 
 echo "# Generated on ${timestamp}" > "${outfile}"
 sha256sum -b "${@}" >> "${outfile}"
