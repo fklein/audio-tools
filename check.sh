@@ -75,18 +75,18 @@ PARAMETERS=("$@")
 
 # Only continue, if  the file integrity can be verified
 if compgen -G *.sha256 >/dev/null 2>&1; then
-	echo $(colorize blue -- "Validating file integrity:")
+	echo "Validating file integrity:" | colorize blue
 	sha256sum -c *.sha256
 fi
 
-echo $(colorize red -- "Do some stuff ...")
+echo "Do some stuff ..." | colorize red
 sleep 10
 
 # --autofix
 
 # When we are done, check if recreation of the SHA file is required.
 if ! sha256sum -c *.sha256 >/dev/null 2>&1; then
-	echo $(colorize blue -- "Creating hash file:")
+	echo "Creating hash file:" | colorize blue
 	${__dir}/create_hashfile.sh *.flac
 fi
 
