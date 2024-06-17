@@ -14,19 +14,23 @@ show_help() {
     local helpstring="\
         usage: $(basename "${__file}") [OPTIONS] DIRECTORY
 
-        This is a description of this program.
+        Toolchain script for FLAC audio archive. Attempt to detect and possibly fix any
+        issues with the FLAC files of a music album.
 
         Parameters are:
             DIRECTORY
-                This is a description of the parameter.
+                The album directory to process.
 
         Valid options are:
             -a --autofix
-                Attempt to automatically fix any issues
+                Attempt to automatically fix any detected issues
+
             -v, --verbose
                 Enable verbose mode.
+
             -t, --trace
                 Enable trace mode.
+
             -h, --help
                 Print this help text.
     "
