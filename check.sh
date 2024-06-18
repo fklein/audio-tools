@@ -80,9 +80,14 @@ PARAMETERS=("$@")
 pushd "$1" >/dev/null 2>&1
 
 # Only continue, if  the file integrity can be verified
+echo "Validating file integrity:" | colorize blue
 if compgen -G *.sha256 >/dev/null 2>&1; then
-	echo "Validating file integrity:" | colorize blue
-	sha256sum -c *.sha256q
+	sha256sum -c *.sha256 || {
+		echo "=> Validation failure <=" | colorize red >&2
+		# exit 99
+	}
+else
+	echo "=> There is no hashfile <=" | colorize red >&2
 fi
 
 # Check if ReplayGain tags are present, if not add them
@@ -109,7 +114,7 @@ metaflac --show-tag=REPLAYGAIN_TRACK_GAIN --show-tag=REPLAYGAIN_ALBUM_GAIN --sho
 
 
 # When we are done, check if recreation of the SHA file is required.
-if ! sha256sum -c *.sha256 >/dev/null 2>&1; then
+if ! sha256sum -c *.sha256 >/dev/null 2>&1 && ${autofix:-false}; then
 	echo "Creating hash file:" | colorize blue
 	${__dir}/create_hashfile.sh *.flac
 fi
