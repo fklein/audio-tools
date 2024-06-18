@@ -77,16 +77,36 @@ if (( $# != 1 )); then
 fi
 PARAMETERS=("$@")
 
+pushd "$1" >/dev/null 2>&1
+
 # Only continue, if  the file integrity can be verified
 if compgen -G *.sha256 >/dev/null 2>&1; then
 	echo "Validating file integrity:" | colorize blue
-	sha256sum -c *.sha256
+	sha256sum -c *.sha256q
 fi
 
-echo "Do some stuff ..." | colorize red
-sleep 10
+# Check if ReplayGain tags are present, if not add them
+echo "Checking ReplayGain information:" | colorize blue
+replay_gain_missing="false"
+for flacfile in *.flac; do
+	track_gain=$(get_tag_value REPLAYGAIN_TRACK_GAIN "${flacfile}") || true
+	track_peak=$(get_tag_value REPLAYGAIN_TRACK_PEAK "${flacfile}") || true
+	album_gain=$(get_tag_value REPLAYGAIN_ALBUM_GAIN "${flacfile}") || true
+	album_peak=$(get_tag_value REPLAYGAIN_ALBUM_PEAK "${flacfile}") || true
+	# echo "ReplayGain for $flacfile = $track_gain / $album_gain"
+	if [[ -z ${track_gain} || -z ${track_peak} || -z ${album_gain} || -z ${album_peak} ]]; then
+		replay_gain_missing="true"
+		echo "=> ${flacfile}: ReplayGain information is missing or incorrect <=" | colorize red >&2
+	fi
+done
+if ${replay_gain_missing} && ${autofix:-false}; then
+	echo "Adding ReplayGain info:" | colorize blue
+	${__dir}/add_replaygain.sh *.flac
+fi
+metaflac --show-tag=REPLAYGAIN_TRACK_GAIN --show-tag=REPLAYGAIN_ALBUM_GAIN --show-tag=REPLAYGAIN_TRACK_PEAK --show-tag=REPLAYGAIN_ALBUM_PEAK *.flac
 
-# --autofix
+# Only allow multiple Tags for "GENRE"
+
 
 # When we are done, check if recreation of the SHA file is required.
 if ! sha256sum -c *.sha256 >/dev/null 2>&1; then
@@ -94,3 +114,4 @@ if ! sha256sum -c *.sha256 >/dev/null 2>&1; then
 	${__dir}/create_hashfile.sh *.flac
 fi
 
+popd >/dev/null 2>&1
