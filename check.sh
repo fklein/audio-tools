@@ -39,15 +39,15 @@ show_help() {
 
 
 # Parse any arguments.
-opts="avth"
-longopts="autofix,verbose,trace,help"
+opts="afvth"
+longopts="autofix,force,verbose,trace,help"
 args=$(getopt -n "${__base}" -o "${opts}" -l "${longopts}" -- "${@}") || {
     echo >&2
     show_help >&2
     exit 1
 }
 eval set -- "${args}"
-unset autofix
+unset autofix force
 while true; do
     case "$1" in
         "--")
@@ -56,6 +56,9 @@ while true; do
             ;;
         "--autofix" | "-a" )
             autofix=true
+            ;;
+        "--force" | "-f" )
+            force=true
             ;;
         "--verbose" | "-v" )
             set -o verbose
