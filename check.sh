@@ -22,8 +22,11 @@ show_help() {
                 The album directory to process.
 
         Valid options are:
-            -a --autofix
+            -a, --autofix
                 Attempt to automatically fix any detected issues
+
+            -f, --force
+                Apply and overwrite all fixes, regardless of necessity
 
             -v, --verbose
                 Enable verbose mode.
@@ -83,7 +86,7 @@ TARGETDIR="${1}"
 
 pushd "${TARGETDIR}" >/dev/null 2>&1
 
-# Check and verify an existing hash file
+# Check if a SHA256 file exists and validate the files
 echo "Validating file integrity:" | colorize blue
 if compgen -G "*.sha256" >/dev/null 2>&1; then
 	sha256sum -c *.sha256 || {
@@ -111,7 +114,7 @@ for flacfile in *.flac; do
 		echo "=> ${flacfile}: ReplayGain information is missing or incorrect <=" | colorize red >&2
 	fi
 done
-if ${replay_gain_missing} && ${autofix:-false}; then
+if ${replay_gain_missing} && ${autofix:-false} || ${force:-false}; then
 	echo "Adding ReplayGain info:" | colorize blue
 	${__dir}/add_replaygain.sh *.flac
 fi
@@ -119,13 +122,13 @@ metaflac --show-tag=REPLAYGAIN_TRACK_GAIN --show-tag=REPLAYGAIN_ALBUM_GAIN --sho
 
 # Only allow multiple Tags for "GENRE"
 
-if ${autofix:-false}; then
+if ${autofix:-false} || ${force:-false}; then
 	echo "Sorting and merging padding:" | colorize blue
 	metaflac --sort-padding *.flac
 fi
 
-# When we are done, check if recreation of the SHA file is required.
-if ! sha256sum -c *.sha256 >/dev/null 2>&1 && ${autofix:-false}; then
+# When we are done, check if recreation of the SHA256 file is required
+if ! sha256sum -c *.sha256 >/dev/null 2>&1 && ${autofix:-false} || ${force:-false}; then
 	echo "Creating hash file:" | colorize blue
 	${__dir}/create_hashfile.sh *.flac
 fi
