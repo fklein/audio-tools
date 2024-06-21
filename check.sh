@@ -96,9 +96,22 @@ if compgen -G "*.sha256" >/dev/null 2>&1; then
 			exit 99
 		fi
 	}
+
+	# TODO: Check if SHA file lists all files
+	# TODO: Check if SHA file contains additional files
 else
 	echo "=> There is no hashfile <=" | colorize red >&2
 fi
+
+#
+# TODO: Check if filenames are OK
+# TODO: Capitalize all tag names
+# TODO: Check if all required tags are present
+# TODO: Check if tags are not present multiple times (exceptions: GENRE, possibly ARTIST)
+# TODO: Check if all files share the same: ALBUMARTIST, DISCNUMBER, TOTALDISKS, TOTALTRACKS, GENRE, DATE, RECORD_TYPE, PUBLISHER, CATALOG_ID, AUDIO_EXTRACTOR
+# TODO: Check if all tag values are in the required format (numbers!)
+# TODO: If we have a picture, check if it is present in the FLAC files
+#
 
 # Check if ReplayGain tags are present, if not add them
 echo "Checking ReplayGain information:" | colorize blue
@@ -109,6 +122,7 @@ for flacfile in *.flac; do
 	album_gain=$(get_tag_value REPLAYGAIN_ALBUM_GAIN "${flacfile}") || true
 	album_peak=$(get_tag_value REPLAYGAIN_ALBUM_PEAK "${flacfile}") || true
 	# echo "ReplayGain for $flacfile = $track_gain / $album_gain"
+	# TODO: check the REPLAYGAIN_ALBUM_GAIN + REPLAYGAIN_ALBUM_PEAK match between all files
 	if [[ -z ${track_gain} || -z ${track_peak} || -z ${album_gain} || -z ${album_peak} ]]; then
 		replay_gain_missing="true"
 		echo "=> ${flacfile}: ReplayGain information is missing or incorrect <=" | colorize red >&2
