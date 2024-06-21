@@ -37,7 +37,7 @@ add_tag() {
 
 replace_tag() {
     (( $# < 3 )) && { echo "usage: ${FUNCNAME} TAGNAME VALUE FLACFILE..." >&2 ; return 99; }
-    echo metaflac --remove-tag="${1^^}" --set-tag="${1^^}=${2}" "${@:3}"
+    metaflac --remove-tag="${1^^}" --set-tag="${1^^}=${2}" "${@:3}"
 }
 
 remove_tag() {
