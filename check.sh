@@ -79,15 +79,19 @@ if (( $# != 1 )); then
 	exit 2
 fi
 PARAMETERS=("$@")
+TARGETDIR="${1}"
 
-pushd "$1" >/dev/null 2>&1
+pushd "${TARGETDIR}" >/dev/null 2>&1
 
-# Only continue, if  the file integrity can be verified
+# Check and verify an existing hash file
 echo "Validating file integrity:" | colorize blue
-if compgen -G *.sha256 >/dev/null 2>&1; then
+if compgen -G "*.sha256" >/dev/null 2>&1; then
 	sha256sum -c *.sha256 || {
 		echo "=> Validation failure <=" | colorize red >&2
-		# exit 99
+		if ${autofix:-false} && ! ${force:-false}; then
+			echo "Aborting: Will not fix unvalidated files unless forced!" | colorize red >&2
+			exit 99
+		fi
 	}
 else
 	echo "=> There is no hashfile <=" | colorize red >&2
