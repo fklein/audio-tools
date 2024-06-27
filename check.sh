@@ -104,7 +104,7 @@ else
 fi
 
 #
-# TODO: Check if filenames are OK
+# TODO: Check if filenames are OK: Format %artist%
 # TODO: Capitalize all tag names
 # TODO: Check if all required tags are present
 # TODO: Check if tags are not present multiple times (exceptions: GENRE, possibly ARTIST)
@@ -115,20 +115,9 @@ fi
 
 # Check if ReplayGain tags are present, if not add them
 echo "Checking ReplayGain information:" | colorize blue
-replay_gain_missing="false"
-for flacfile in *.flac; do
-	track_gain=$(get_tag_value REPLAYGAIN_TRACK_GAIN "${flacfile}") || true
-	track_peak=$(get_tag_value REPLAYGAIN_TRACK_PEAK "${flacfile}") || true
-	album_gain=$(get_tag_value REPLAYGAIN_ALBUM_GAIN "${flacfile}") || true
-	album_peak=$(get_tag_value REPLAYGAIN_ALBUM_PEAK "${flacfile}") || true
-	# echo "ReplayGain for $flacfile = $track_gain / $album_gain"
-	# TODO: check the REPLAYGAIN_ALBUM_GAIN + REPLAYGAIN_ALBUM_PEAK match between all files
-	if [[ -z ${track_gain} || -z ${track_peak} || -z ${album_gain} || -z ${album_peak} ]]; then
-		replay_gain_missing="true"
-		echo "=> ${flacfile}: ReplayGain information is missing or incorrect <=" | colorize red >&2
-	fi
-done
-if ${replay_gain_missing} && ${autofix:-false} || ${force:-false}; then
+invalid_replaygain="false"
+${__dir}/check_replaygain.sh *.flac || invalid_replaygain="true"
+if ${invalid_replaygain:-"false"} && ${autofix:-"false"} || ${force:-"false"}; then
 	echo "Adding ReplayGain info:" | colorize blue
 	${__dir}/add_replaygain.sh *.flac
 fi
@@ -139,6 +128,7 @@ metaflac --show-tag=REPLAYGAIN_TRACK_GAIN --show-tag=REPLAYGAIN_ALBUM_GAIN --sho
 if ${autofix:-false} || ${force:-false}; then
 	echo "Sorting and merging padding:" | colorize blue
 	metaflac --sort-padding *.flac
+	echo "Done"
 fi
 
 # When we are done, check if recreation of the SHA256 file is required
