@@ -84,6 +84,7 @@ fi
 PARAMETERS=("$@")
 TARGETDIR="${1}"
 
+start_timestamp=$(date '+%s')
 pushd "${TARGETDIR}" >/dev/null 2>&1
 
 # Check if a SHA256 file exists and validate the files
@@ -138,3 +139,4 @@ if ! sha256sum -c *.sha256 >/dev/null 2>&1 && ${autofix:-false} || ${force:-fals
 fi
 
 popd >/dev/null 2>&1
+echo "Finished in $(duration "${start_timestamp}")" | colorize "green"

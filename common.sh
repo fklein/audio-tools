@@ -103,3 +103,11 @@ colorize() {
         (( $# > 0 )) && printf " " || printf "\n"
     done
 }
+
+duration() {
+    local now=$(date '+%s')
+    local from=${1-${now}}
+    local to=${2-${now}}
+    local rt=$(( ${to} - ${from} ))
+    printf '%02d:%02d:%02d\n' "$((rt/3600))" "$(((rt%3600)/60))" "$(((rt%3600)%60))"
+}
