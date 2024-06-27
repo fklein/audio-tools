@@ -58,10 +58,10 @@ while true; do
             break
             ;;
         "--autofix" | "-a" )
-            autofix=true
+            autofix="true"
             ;;
         "--force" | "-f" )
-            force=true
+            force="true"
             ;;
         "--verbose" | "-v" )
             set -o verbose
@@ -92,7 +92,7 @@ echo "Validating file integrity:" | colorize blue
 if compgen -G "*.sha256" >/dev/null 2>&1; then
 	sha256sum -c *.sha256 || {
 		echo "=> Validation failure <=" | colorize red >&2
-		if ${autofix:-false} && ! ${force:-false}; then
+		if ${autofix:-"false"} && ! ${force:-"false"}; then
 			echo "Aborting: Will not fix unvalidated files unless forced!" | colorize red >&2
 			exit 99
 		fi
@@ -126,14 +126,14 @@ metaflac --show-tag=REPLAYGAIN_TRACK_GAIN --show-tag=REPLAYGAIN_ALBUM_GAIN --sho
 
 # Only allow multiple Tags for "GENRE"
 
-if ${autofix:-false} || ${force:-false}; then
+if ${autofix:-"false"} || ${force:-"false"}; then
 	echo "Sorting and merging padding:" | colorize blue
 	metaflac --sort-padding *.flac
 	echo "Done"
 fi
 
 # When we are done, check if recreation of the SHA256 file is required
-if ! sha256sum -c *.sha256 >/dev/null 2>&1 && ${autofix:-false} || ${force:-false}; then
+if ! sha256sum -c *.sha256 >/dev/null 2>&1 && ${autofix:-"false"} || ${force:-"false"}; then
 	echo "Creating hash file:" | colorize blue
 	${__dir}/create_hashfile.sh *.flac
 fi

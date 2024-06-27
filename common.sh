@@ -45,7 +45,7 @@ remove_tag() {
     metaflac --remove-tag="${1^^}" "${@:2}"
 }
 
-[[ -t 1 ]] && istty=true
+[[ -t 1 ]] && istty="true"
 colorize() {
     local escapecodes
     declare -A escapecodes=(
@@ -88,7 +88,7 @@ colorize() {
         done
         shift
     done
-	${istty:-false} || { fmtseq='' ; fmtreset='' ; }
+	${istty:-"false"} || { fmtseq='' ; fmtreset='' ; }
     # Print formated text from stdin if no text parameters are given
     if (( $# == 0 )); then
         local stdin
