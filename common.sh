@@ -2,7 +2,7 @@
 
 get_tag_value() {
     (( $# != 2 )) && { echo "usage: ${FUNCNAME} TAGNAME FLACFILE" >&2 ; return 99; }
-    metaflac --show-tag="${1}" "${2}" | grep -oP "(?<=${1}=).*"
+    metaflac --show-tag="${1}" "${2}" | grep -ioP "(?<=${1}=).*"
 }
 
 get_artist() {
