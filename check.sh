@@ -98,19 +98,28 @@ if compgen -G "*.sha256" >/dev/null 2>&1; then
 		fi
 	}
 
-	# TODO: Check if SHA file lists all files
+	# TODO: Check if SHA file lists all flac files
 	# TODO: Check if SHA file contains additional files
 else
 	echo "=> There is no hashfile <=" | colorize red >&2
 fi
 
-#
-# TODO: Check if filenames are OK: Format %artist%
-# TODO: Capitalize all tag names
+# Capitalize all tag names
+echo "Checking tag capitalization:" | colorize blue
+invalid_tags="false"
+${__dir}/check_tags_capitalized.sh *.flac || invalid_tags="true"
+if ${invalid_tags:-"false"} && ${autofix:-"false"} || ${force:-"false"}; then
+	echo "Capitalizing tags:" | colorize blue
+	${__dir}/capitalize_tags.sh *.flac
+fi
+
+
 # TODO: Check if all required tags are present
 # TODO: Check if tags are not present multiple times (exceptions: GENRE, possibly ARTIST)
 # TODO: Check if all files share the same: ALBUMARTIST, DISCNUMBER, TOTALDISKS, TOTALTRACKS, GENRE, DATE, RECORD_TYPE, PUBLISHER, CATALOG_ID, AUDIO_EXTRACTOR
 # TODO: Check if all tag values are in the required format (numbers!)
+# TODO: Check all files have the exact same tags present (names only, not values!)
+# TODO: Check tag names do not contain spaces
 # TODO: If we have a picture, check if it is present in the FLAC files
 #
 
@@ -125,6 +134,8 @@ fi
 metaflac --show-tag=REPLAYGAIN_TRACK_GAIN --show-tag=REPLAYGAIN_ALBUM_GAIN --show-tag=REPLAYGAIN_TRACK_PEAK --show-tag=REPLAYGAIN_ALBUM_PEAK *.flac
 
 # Only allow multiple Tags for "GENRE"
+#
+# TODO: Check if filenames are OK: Format %artist%
 
 if ${autofix:-"false"} || ${force:-"false"}; then
 	echo "Sorting and merging padding:" | colorize blue
