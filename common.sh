@@ -88,7 +88,7 @@ colorize() {
         done
         shift
     done
-	${istty:-"false"} || { fmtseq='' ; fmtreset='' ; }
+    ${istty:-"false"} || { fmtseq='' ; fmtreset='' ; }
     # Print formated text from stdin if no text parameters are given
     if (( $# == 0 )); then
         local stdin

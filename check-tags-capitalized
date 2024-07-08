@@ -14,7 +14,7 @@ readonly __base="$(basename "${__file}" .sh)"
 invalid="false"
 for flacfile in "${@}"; do
     metaflac --export-tags-to=- "${flacfile}" | while read -r tagline; do
-		[[ "${tagline}" != *=*  ]] && continue
+        [[ "${tagline}" != *=*  ]] && continue
         tagname="${tagline%%=*}"
         tagvalue="${tagline#*=}"
         if [[ "${tagname}" != "${tagname@U}" ]]; then
